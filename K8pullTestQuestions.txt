@@ -1,0 +1,123 @@
+Kubernetes Image Pulling — Trick Exam Questions
+Most Kubernetes outages aren’t caused by bad YAML — they’re caused by bad assumptions.
+
+🔥 Trick Question 1: The Laptop Fallacy
+
+Question
+A student runs docker pull myrepo/app:latest successfully on their laptop, but the Pod shows ImagePullBackOff.
+Which statement is MOST accurate?
+
+A. Kubernetes caches images separately from Docker
+B. The image tag is corrupted
+C. The node cannot authenticate to the registry
+D. The YAML must be reapplied
+
+🔥 Trick Question 2: Who Pulls the Image?
+
+Question
+Which component actually pulls the container image?
+
+A. kubectl
+B. The Pod
+C. The Kubernetes API server
+D. The node’s container runtime
+
+🔥 Trick Question 3: YAML Addiction
+
+Question
+A Pod fails with ImagePullBackOff. The student edits the Deployment YAML five times but the error persists.
+What is the most likely reason?
+
+A. Kubernetes caches bad YAML
+B. The imagePullPolicy is wrong
+C. The underlying registry permissions are unchanged
+D. The Service selector is incorrect
+
+🔥 Trick Question 4: kubectl apply Myth
+
+Question
+What happens when you run kubectl apply -f deployment.yaml?
+
+A. The image is pulled immediately
+B. The node validates registry credentials
+C. The desired state is stored in etcd
+D. The Pod starts running
+
+🔥 Trick Question 5: Node Identity Blind Spot
+
+Question
+In EKS, which identity is used to pull images from ECR by default?
+
+A. The user running kubectl
+B. The Pod’s service account
+C. The node’s IAM role
+D. The Kubernetes API server
+
+🔥 Trick Question 6: imagePullSecret Overuse
+
+Question
+Which scenario usually does NOT require an imagePullSecret?
+
+A. Private Docker Hub repo
+B. EKS pulling from ECR
+C. GKE pulling from Artifact Registry
+D. Third-party private registry
+
+🔥 Trick Question 7: Image Exists… or Does It?
+
+Question
+A Pod fails with manifest unknown. What is the MOST likely cause?
+
+A. Node out of disk
+B. Wrong image tag
+C. Missing liveness probe
+D. TLS certificate expired
+
+🔥 Trick Question 8: Retrying Means Temporary… Right?
+
+Question
+Kubernetes retries pulling an image for several minutes. What does this imply?
+
+A. Kubernetes expects the registry to recover
+B. Kubernetes thinks permissions might change
+C. Kubernetes does not know the failure is permanent
+D. All of the above
+
+🔥 Trick Question 9: The “kubectl describe” Test
+
+Question
+Which command gives the MOST useful information for ImagePullBackOff?
+
+A. kubectl get pods
+B. kubectl logs pod
+C. kubectl describe pod
+D. kubectl get deployment
+
+🔥 Trick Question 10: Public vs Private Confusion
+
+Question
+Why do public Docker Hub images usually “just work”?
+
+A. Kubernetes includes default credentials
+B. Nodes cache Docker Hub credentials
+C. Docker Hub allows anonymous pulls
+D. Docker Hub runs inside Kubernetes
+
+🔥 Trick Question 11: The Nuclear Option
+
+Question
+A student deletes and recreates the cluster to fix ImagePullBackOff.
+What is the MOST accurate assessment?
+
+A. Correct approach
+B. Overkill masking a permissions issue
+C. Necessary to reset kubelet
+D. Required to clear Docker cache
+
+🔥 Trick Question 12: One-Sentence Truth (Short Answer)
+
+Question
+Complete this sentence:
+
+“Pods don’t pull images. __________ does.”
+
