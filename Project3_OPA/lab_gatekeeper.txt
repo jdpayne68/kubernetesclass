@@ -1,3 +1,12 @@
+ The deployment order
+
+1. Install Gatekeeper (once per cluster)
+2. Apply the ConstraintTemplates
+3. Apply the Constraints
+4. Apply namespaces + apps
+5. Try to “cheat” (change prod app destination to splunk-dev) → watch OPA deny it
+6. Try to expose wrong Service port in prod → watch OPA deny it
+
 
 helm repo add gatekeeper https://open-policy-agent.github.io/gatekeeper/charts
 helm repo update
