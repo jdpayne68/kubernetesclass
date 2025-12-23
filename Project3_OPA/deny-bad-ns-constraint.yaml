@@ -1,0 +1,13 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sDenyBadDemo
+metadata:
+  name: deny-bad-namespace
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Namespace"]
+
+
+
+# kubectl apply -f deny-bad-ns-constraint.yaml
