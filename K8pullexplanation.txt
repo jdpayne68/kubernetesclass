@@ -1,0 +1,176 @@
+The Mental Model (one sentence) “Kubernetes doesn’t pull images. Nodes do.
+If nodes can’t authenticate to the registry, your YAML won’t matter.”
+
+A Pod never pulls an image.
+A node (worker VM) pulls the image because Kubernetes told it to.
+So the “repo → pod” path is really:
+Registry (ECR/Artifact/Docker Hub) → Node runtime (containerd/docker) → Pod containers
+
+
+Step-by-step: what happens when you apply YAML
+Step 1) You write a manifest that names an image
+
+Example:
+containers:
+- name: splunk
+  image: us-central1-docker.pkg.dev/myproj/obs/splunk:latest
+This image string is just a pointer (a URL-like name).
+
+✅ Nothing is downloaded yet.
+
+Step 2) You apply the manifest
+kubectl apply -f deploy.yaml
+
+What kubectl does:
+  sends the YAML to the Kubernetes API server
+  the API server stores it in etcd
+  controllers notice a desired state: “I need 1 pod running this image”
+
+✅ Still nothing is pulled yet.
+
+Step 3) Scheduler chooses a node
+Kubernetes picks a node that has enough CPU/memory and matches constraints.
+
+You can see it here:
+kubectl get pod -o wide
+
+
+Look for the NODE column.
+✅ Still nothing is pulled yet.
+
+
+Step 4) Kubelet on that node tries to create the container
+Now the important part:
+On the chosen node, a component called kubelet says to the container runtime (usually containerd):
+  “Start a container using image X.”
+
+If the image isn’t present locally on the node, containerd says:
+  “I need to pull it from the registry.”
+
+✅ This is the first moment the registry is contacted.
+
+Step 5) The node authenticates to the registry (or fails)
+This is the part beginners miss.
+The registry asks:
+
+  “Who are you, and are you allowed to pull this image?”
+
+The node answers using one of these methods:
+
+Method A — Public image (Docker Hub public)
+No auth needed. It pulls.
+
+Method B — Private registry (ECR / Artifact Registry)
+The node must present valid credentials.
+
+Where do those credentials come from?
+  EKS: node’s IAM role (or imagePullSecret you configured)
+  GKE: node pool’s service account permissions
+  Any K8s: an imagePullSecret can be provided to the Pod
+
+If credentials are missing:
+  you get ImagePullBackOff
+  and the Pod never starts
+
+Step 6) The node downloads layers and stores them locally
+Images are made of layers.
+
+The node downloads layers once and caches them locally.
+Next pod using same image tag can start faster.
+
+You can watch events:
+kubectl describe pod <pod>
+
+You’ll see:
+  Pulling image…
+  Pulled image…
+  Created container…
+  Started container…
+
+Step 7) The container starts inside the Pod
+Once the image is pulled, kubelet starts the container.
+Now the Pod is finally “Running”.
+
+Verify:
+
+kubectl get pods
+kubectl logs <pod>
+
+What the CLI commands “really” do
+  “docker pull …” (on your laptop)
+
+This pulls the image to your laptop.
+
+It is useful for:
+  validating the image exists
+  testing locally
+  verifying your credentials work
+
+But it does NOT prove the cluster can pull the image, because:
+  Kubernetes pulls from the node identity, not your laptop.
+
+AWS and GCP COMMANDS
+“aws ecr get-login-password | docker login …”
+
+This command:
+  asks AWS for a short-lived registry token
+  logs your local Docker client into ECR
+
+Again: useful locally, but not automatically used by Kubernetes.
+
+  “gcloud auth configure-docker …”
+
+This edits Docker config on your machine so Docker can pull from Artifact Registry.
+
+Also local.
+
+How Kubernetes gets credentials (3 patterns)
+
+Pattern 1 — Node Identity (most common in EKS/GKE)
+
+✅ Best for teaching in managed clusters.
+
+  EKS nodes have an IAM role that can pull from ECR
+  GKE nodes have a service account that can pull from Artifact Registry
+You don’t put secrets in Kubernetes at all.
+
+Pros: clean, scalable
+Cons: permissions are “cluster-wide” per node pool (broader)
+
+Pattern 2 — imagePullSecret (per namespace / per workload)
+
+You create a Docker registry secret inside Kubernetes:
+kubectl -n <ns> create secret docker-registry regcred \
+  --docker-server=<registry> \
+  --docker-username=<user> \
+  --docker-password=<pass-or-token> \
+  --docker-email=<email>
+
+Then reference it in your Pod spec:
+spec:
+  imagePullSecrets:
+    - name: regcred
+
+Pros: explicit and portable
+Cons: secret management overhead + rotation
+
+Pattern 3 — Workload Identity / IRSA (advanced)
+Pod uses a service account mapped to cloud IAM.
+This is the “least privilege” model, but more complex.
+
+If Pod shows ImagePullBackOff, the debugging questions are:
+
+  Does the image name/tag exist?
+  Is it public or private?
+  If private: what identity is pulling?
+    Node IAM role (EKS)?
+    Node pool service account (GKE)?
+    imagePullSecret?
+
+Commands:
+kubectl describe pod <pod>
+kubectl get pod <pod> -o jsonpath='{.spec.containers[*].image}'
+kubectl -n <ns> get secret
+
+
+
