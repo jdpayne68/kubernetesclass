@@ -1,0 +1,9 @@
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper/master/deploy/gatekeeper.yaml
+
+
+kubectl -n gatekeeper-system get pods
+kubectl get validatingwebhookconfigurations | grep gatekeeper
+kubectl get crd | grep gatekeeper
+
+
+kubectl get validatingwebhookconfigurations | grep gatekeeper
