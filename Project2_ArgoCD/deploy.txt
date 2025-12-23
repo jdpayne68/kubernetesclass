@@ -26,3 +26,14 @@ http://localhost:9081
 Step 6 — Initial Admin Password
 
 Username: admin
+
+
+For Splunk as an example 
+
+kubectl apply -f splunk-app.yaml
+
+Verify 
+kubectl -n argocd get applications
+kubectl -n splunk get pods,svc,pvc,ingress
+
+
