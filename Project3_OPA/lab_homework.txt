@@ -1,1 +1,14 @@
+#output this and send to Chewbacca.
+
+kubectl -n gatekeeper-system get pods
+kubectl get validatingwebhookconfigurations | grep gatekeeper
+
+kubectl get constrainttemplates | egrep "k8sargoappenvironment|k8sserviceportbyenv"
+kubectl get constraints | egrep "argo-app-env-namespace-lock|splunk-service-port-lock"
+
+kubectl -n argocd get applications
+
+kubectl apply -f 40-cheat-prod-to-dev.yaml
+kubectl apply -f 41-cheat-prod-service-wrong-port.yaml
+
 
