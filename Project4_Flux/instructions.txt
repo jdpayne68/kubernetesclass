@@ -108,8 +108,12 @@ Flux runs two big loops:
   Kustomize Controller applies manifests → enforces drift correction
 
 So troubleshooting often starts with:
+Debug commands 
 
 flux get sources git -A
 flux get kustomizations -A
 kubectl -n flux-system logs deploy/source-controller --tail=200
 kubectl -n flux-system logs deploy/kustomize-controller --tail=200
+kubectl describe gitrepositories.source.toolkit.fluxcd.io -n flux-system platform-repo
+kubectl describe kustomizations.kustomize.toolkit.fluxcd.io -n flux-system splunk-dev
+
