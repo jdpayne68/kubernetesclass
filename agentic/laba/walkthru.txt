@@ -84,7 +84,13 @@ F) llow Kubernetes SA to Use Google SA
 
 G) Broken App
 
-broken-app.yaml: 
+broken-app.yaml: https://github.com/BalericaAI/kubernetesclass/blob/main/agentic/laba/yaml/broken-app.yaml
+
+Apply: kubectl apply -f broken-app.yaml
+
+H) Agent Python Code
+
+agent.py: 
 
 
 
