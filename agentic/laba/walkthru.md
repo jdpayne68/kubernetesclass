@@ -1,5 +1,6 @@
 Vertex AI Single Agent on GKE
-Lab Title
+Mantra: “The AI is not Kubernetes. The AI is not magic. The AI is being used as a reasoning step inside a normal cloud-native system.”
+Secret Point: “Your code is the agent. Vertex AI is the reasoning engine. Kubernetes is the environment.”
 
 GKE Log Investigator Agent using Vertex AI
 
@@ -145,12 +146,19 @@ O) Success Criteria
 
 Students pass the lab when they can show:
 
-Broken app running
-Agent pod running
-Agent reads logs
-Agent calls Vertex AI
-Agent prints diagnosis
-Agent explains likely issue
-Agent either recommends action or performs safe restart
+    Broken app running
+    Agent pod running
+    Agent reads logs
+    Agent calls Vertex AI
+    Agent prints diagnosis
+    Agent explains likely issue
+    Agent either recommends action or performs safe restart
+
+In Conclusion.....
+SpeechOPS: “I built a GKE-based AI agent that inspected pod logs, used Vertex AI to classify failures, and made a controlled remediation decision.”
+Or
+“I understand that agentic AI is not just prompting. It requires tools, permissions, runtime, guardrails, and feedback loops.”
+
+
 
 
